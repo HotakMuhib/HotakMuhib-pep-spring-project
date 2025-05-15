@@ -1,6 +1,7 @@
 package com.example.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -43,15 +44,15 @@ public class SocialMediaController {
             return ResponseEntity.ok(new AccountResponse(createdAccount.getAccountId(), createdAccount.getUsername()));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         }
     }
 
-
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Account loginRequest) {
-        return accountService.login(loginRequest.getUsername(), loginRequest.getPassword())
-                .<ResponseEntity<?>>map(account ->
-                        ResponseEntity.ok(new AccountResponse(account.getAccountId(), account.getUsername())))
-                .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials"));
-    }
+    return accountService.login(loginRequest.getUsername(), loginRequest.getPassword())
+            .<ResponseEntity<?>>map(account -> ResponseEntity.ok(account)) 
+            .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials"));
+}
 }

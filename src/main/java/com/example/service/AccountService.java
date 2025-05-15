@@ -11,7 +11,7 @@ import com.example.repository.AccountRepository;
 
 @Service
 public class AccountService {
-    
+
     private String username;
     private String password;
 
@@ -27,7 +27,7 @@ public class AccountService {
             throw new IllegalArgumentException("Username cannot be blank");
         }
 
-        if (account.getPassword() == null || account.getPassword().length() < 4) {
+        if (account.getPassword() == null || account.getPassword().length() <= 4) {
             throw new IllegalArgumentException("Password must be at least 4 characters");
         }
 

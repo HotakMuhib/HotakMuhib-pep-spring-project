@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.example.entity.*;
 import com.example.service.AccountService;
+import com.example.service.AccountResponse;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,7 @@ import java.util.*;
  */
 
  @RestController
- @RequestMapping("/accounts")
+ @RequestMapping
 public class SocialMediaController {
 
     private final AccountService accountService;
@@ -37,23 +38,20 @@ public class SocialMediaController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody Account account) {
-    try {
-        Account createdAccount = accountService.register(account);
-        return ResponseEntity.ok(createdAccount);
-    } catch (IllegalArgumentException e) {
-        return ResponseEntity.badRequest().body(e.getMessage());
+        try {
+            Account createdAccount = accountService.register(account);
+            return ResponseEntity.ok(new AccountResponse(createdAccount.getAccountId(), createdAccount.getUsername()));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
-}
+
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Account loginRequest) {
-        if (accountService.login(loginRequest.getUsername(), loginRequest.getPassword()) != null) {
-            return new ResponseEntity<>(HttpStatus.OK);
-
-        } else {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }
-        
-                
-        }
+        return accountService.login(loginRequest.getUsername(), loginRequest.getPassword())
+                .<ResponseEntity<?>>map(account ->
+                        ResponseEntity.ok(new AccountResponse(account.getAccountId(), account.getUsername())))
+                .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials"));
     }
+}

@@ -1,12 +1,19 @@
 package com.example.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.example.entity.*;
 import com.example.service.AccountService;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.*;
@@ -28,14 +35,25 @@ public class SocialMediaController {
         this.accountService = accountService;
     }
 
-    @GetMapping
-    public List<Account> getAllAccounts() {
-        return accountService.getAllAccounts();
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<Account> getAccountById(@PathVariable Integer id) {
-        return accountService.getAccountById(id)
-        .map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody Account account) {
+    try {
+        Account createdAccount = accountService.register(account);
+        return ResponseEntity.ok(createdAccount);
+    } catch (IllegalArgumentException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
     }
 }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody Account loginRequest) {
+        if (accountService.login(loginRequest.getUsername(), loginRequest.getPassword()) != null) {
+            return new ResponseEntity<>(HttpStatus.OK);
+
+        } else {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        
+                
+        }
+    }

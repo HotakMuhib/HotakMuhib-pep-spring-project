@@ -58,7 +58,7 @@ public class SocialMediaController {
         }
 
         Message created = messageService.createMessage(message);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        return ResponseEntity.ok(created);
     }
 
     @GetMapping("/messages")
@@ -105,8 +105,13 @@ public class SocialMediaController {
     }
 }
     @DeleteMapping("/messages/{id}")
-    public ResponseEntity<Integer> deleteMessage(@PathVariable Integer id) {
+    public ResponseEntity<?> deleteMessage(@PathVariable Integer id) {
         int deletedRows = messageService.deleteMessageById(id);
+
+        if(deletedRows ==0) {
+            return ResponseEntity.ok().build();
+        }
         return ResponseEntity.ok(deletedRows);
     }
+
 }

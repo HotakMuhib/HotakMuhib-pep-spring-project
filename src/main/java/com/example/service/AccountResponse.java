@@ -11,10 +11,7 @@ public class AccountResponse {
         this.accountId = accountId;
         this.username = username;
     }
-    // public AccountResponse(Account account) {
-    //     this.accountId = account.getAccountId();
-    //     this.username = account.getUsername();
-    // }
+
     public Integer getAccountId() {
         return accountId;
     }
